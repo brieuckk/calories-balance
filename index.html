@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f7f4">
+<title>Balance</title>
+<style>
+:root{--bg:#f7f7f4;--card:#fff;--ink:#20251f;--muted:#858b82;--green:#547b62;--pale:#e8efe9;--line:#e9ebe5;--red:#bd685c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:26px 20px 16px;max-width:850px;margin:auto}
+.brand{font-size:25px;font-weight:750;letter-spacing:-1px}
+.brand span{color:var(--green)}
+header p{color:var(--muted);font-size:13px;margin:5px 0 0}
+nav{display:flex;gap:7px;overflow:auto;padding:0 20px 15px;max-width:850px;margin:auto}
+nav button{border:0;background:#eceee9;color:#62695f;padding:10px 15px;border-radius:30px;white-space:nowrap;font-size:13px}
+nav button.active{background:var(--green);color:white}
+main{max-width:850px;margin:auto;padding:0 16px 50px}
+section{display:none}section.active{display:block}
+h2{font-size:20px;margin:12px 0 15px;letter-spacing:-.5px}
+h3{font-size:15px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;margin-bottom:13px}
+.muted{color:var(--muted);font-size:12px}
+.small{font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px}
+.stat strong{display:block;font-size:25px;margin-top:7px;letter-spacing:-1px}
+.stat span{color:var(--muted);font-size:11px}
+.balance{background:var(--pale);border:0}
+.balance strong{color:var(--green)}
+label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink);font-size:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button.primary{border:0;background:var(--green);color:#fff;border-radius:10px;padding:12px 16px;font-weight:600;margin-top:13px;width:100%;font-size:14px}
+button.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 11px;font-size:12px}
+button.danger{color:var(--red);border-color:#f0d9d5}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.item strong{font-size:14px}
+.item .muted{margin-top:4px}
+.item-right{text-align:right;white-space:nowrap}
+.bar{height:9px;background:#edf0eb;border-radius:20px;overflow:hidden;margin-top:8px}
+.bar div{height:100%;background:var(--green);border-radius:20px}
+.chart{height:145px;display:flex;align-items:end;gap:9px;padding-top:12px}
+.daybar{flex:1;text-align:center;min-width:0}
+.daybar div{background:#a8c0ad;border-radius:6px 6px 2px 2px;min-height:3px}
+.daybar small{display:block;font-size:10px;color:var(--muted);margin-top:7px}
+.daybar em{display:block;font-size:9px;color:var(--muted);font-style:normal;margin-bottom:5px}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">BAL<span>ANCE</span></div>
+  <p>Ton suivi quotidien, simplement.</p>
+</header>
+<nav>
+  <button class="active" data-tab="today">Aujourd'hui</button>
+  <button data-tab="foods">Mes aliments</button>
+  <button data-tab="stats">Statistiques</button>
+  <button data-tab="settings">Données</button>
+</nav>
+<main>
+<section id="today" class="active">
+  <h2>Mon journal</h2>
+  <div class="card">
+    <label for="day">Date</label>
+    <input type="date" id="day">
+  </div>
+  <div class="stats">
+    <div class="stat"><span>Consommées</span><strong id="consumed">0</strong><span>kcal</span></div>
+    <div class="stat"><span>Dépensées</span><strong id="burned">—</strong><span>kcal</span></div>
+    <div class="stat balance"><span>Balance énergétique</span><strong id="balance">—</strong><span id="balanceLabel">À compléter</span></div>
+    <div class="stat"><span>Aliments enregistrés</span><strong id="count">0</strong><span>entrées</span></div>
+  </div>
+  <div class="card" style="margin-top:13px">
+    <h3>Ajouter un aliment au journal</h3>
+    <label for="foodSelect">Aliment</label>
+    <select id="foodSelect"></select>
+    <div class="row">
+      <div><label for="amount">Quantité consommée</label><input id="amount" type="number" min="0" step="any" placeholder="Ex. 150"></div>
+      <div><label>Unité</label><input id="unitDisplay" disabled value="g"></div>
+    </div>
+    <p class="muted" id="calculation">Le calcul apparaîtra ici.</p>
+    <label for="meal">Repas</label>
+    <select id="meal"><option>Petit-déjeuner</option><option>Déjeuner</option><option>Dîner</option><option>Collation</option></select>
+    <button class="primary" id="addEntry">Ajouter au journal</button>
+  </div>
+  <div class="card">
+    <h3>Mes repas</h3>
+    <div id="entries"></div>
+  </div>
+  <div class="card">
+    <h3>Dépenses énergétiques</h3>
+    <p class="muted">Encode le total des calories dépensées indiqué par Apple, et non uniquement les calories actives.</p>
+    <label for="expenditure">Dépenses totales (kcal)</label>
+    <input id="expenditure" type="number" min="0" placeholder="Ex. 2450">
+    <button class="primary" id="saveExpenditure">Enregistrer les dépenses</button>
+  </div>
+  <div class="card">
+    <h3>Poids</h3>
+    <label for="weight">Poids du jour (kg)</label>
+    <input id="weight" type="number" min="0" step="0.1" placeholder="Ex. 80">
+    <button class="primary" id="saveWeight">Enregistrer le poids</button>
+  </div>
+</section>
+
+<section id="foods">
+  <h2>Ma bibliothèque alimentaire</h2>
+  <div class="card">
+    <h3>Ajouter un aliment</h3>
+    <label for="foodName">Nom de l'aliment</label>
+    <input id="foodName" placeholder="Ex. Riz basmati">
+    <div class="row">
+      <div><label for="foodCalories">Calories (kcal)</label><input id="foodCalories" type="number" min="0" step="any" placeholder="Ex. 360"></div>
+      <div><label for="foodUnit">Pour quelle quantité ?</label><select id="foodUnit"><option value="100g">100 g</option><option value="100ml">100 ml</option><option value="portion">1 portion</option></select></div>
+    </div>
+    <button class="primary" id="saveFood">Enregistrer l'aliment</button>
+    <p class="muted">Utilise les valeurs nutritionnelles de l'emballage. Pour un aliment vendu par portion, indique les calories d'une portion.</p>
+  </div>
+  <div class="card">
+    <h3>Mes aliments enregistrés</h3>
+    <div id="foodList"></div>
+  </div>
+</section>
+
+<section id="stats">
+  <h2>Mes statistiques</h2>
+  <div class="card">
+    <h3>Cette semaine</h3>
+    <p class="muted">Calories consommées par jour</p>
+    <div class="chart" id="chart"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><span>Consommation moyenne</span><strong id="avgIn">—</strong><span>kcal / jour enregistré</span></div>
+    <div class="stat"><span>Dépenses moyennes</span><strong id="avgOut">—</strong><span>kcal / jour enregistré</span></div>
+    <div class="stat balance"><span>Balance moyenne</span><strong id="avgBalance">—</strong><span>kcal / jour</span></div>
+    <div class="stat"><span>Jours en déficit</span><strong id="deficitDays">0</strong><span>sur 7 jours</span></div>
+  </div>
+  <div class="card" style="margin-top:13px">
+    <h3>Évolution du poids</h3>
+    <div id="weightHistory"></div>
+  </div>
+  <p class="muted">Les moyennes sont calculées sur les jours où les données correspondantes sont encodées. Les estimations de dépenses Apple restent approximatives.</p>
+</section>
+
+<section id="settings">
+  <h2>Mes données</h2>
+  <div class="card">
+    <h3>Sauvegarder mes données</h3>
+    <p class="muted">Télécharge une copie de ta bibliothèque alimentaire et de ton journal. Garde ce fichier en lieu sûr.</p>
+    <button class="primary" id="export">Exporter ma sauvegarde</button>
+  </div>
+  <div class="card">
+    <h3>Restaurer une sauvegarde</h3>
+    <p class="muted">Importe un fichier JSON Balance précédemment exporté. Les données actuelles seront remplacées.</p>
+    <input type="file" id="importFile" accept=".json,application/json">
+    <button class="primary" id="import">Importer la sauvegarde</button>
+  </div>
+  <div class="card">
+    <h3>À propos</h3>
+    <p class="muted">Balance est une application personnelle. Tes données sont conservées dans le stockage local de ton navigateur. Elles ne sont pas envoyées sur un serveur.</p>
+  </div>
+</section>
+</main>
+<footer>Balance · Ton suivi personnel</footer>
+
+<script>
+const KEY="balance_v1";
+let data=JSON.parse(localStorage.getItem(KEY)||'{"foods":[],"days":{}}');
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString("en-CA");
+const date=()=> $("day").value||today();
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const dayData=d=>data.days[d]||(data.days[d]={entries:[],expenditure:null,weight:null});
+const kcal=n=>Math.round(n).toLocaleString("fr-BE");
+function foodKcal(f,amount){return f.unit==="portion"?f.calories*amount:f.calories*amount/100}
+function selectedFood(){return data.foods.find(f=>f.id===$("foodSelect").value)}
+function refreshFoodSelect(){
+ $("foodSelect").innerHTML=data.foods.map(f=>`<option value="${f.id}">${esc(f.name)} · ${f.calories} kcal / ${f.unit==="portion"?"portion":f.unit==="100g"?"100 g":"100 ml"}</option>`).join("");
+ $("unitDisplay").value=selectedFood()?.unit==="portion"?"portion":selectedFood()?.unit==="100ml"?"ml":"g";
+ updateCalc();
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function updateCalc(){
+ const f=selectedFood(),a=Number($("amount").value);
+ $("calculation").textContent=f&&a>0?`Soit environ ${kcal(foodKcal(f,a))} kcal.`:"Indique un aliment et une quantité.";
+}
+function renderToday(){
+ const d=dayData(date()),total=d.entries.reduce((s,e)=>s+e.kcal,0);
+ $("consumed").textContent=kcal(total);$("burned").textContent=d.expenditure==null?"—":kcal(d.expenditure);
+ $("count").textContent=d.entries.length;
+ const bal=d.expenditure==null?null:total-d.expenditure;
+ $("balance").textContent=bal==null?"—":(bal>0?"+":"")+kcal(bal);
+ $("balanceLabel").textContent=bal==null?"À compléter":bal<0?"Déficit estimé":bal>0?"Surplus estimé":"Équilibre estimé";
+ $("balance").style.color=bal==null?"var(--ink)":bal<=0?"var(--green)":"var(--red)";
+ $("expenditure").value=d.expenditure??"";$("weight").value=d.weight??"";
+ $("entries").innerHTML=d.entries.length?d.entries.map((e,i)=>`<div class="item"><div><strong>${esc(e.name)}</strong><div class="muted">${esc(e.meal)} · ${e.amount} ${esc(e.unit)}</div></div><div class="item-right"><strong>${kcal(e.kcal)} kcal</strong><br><button class="secondary danger" onclick="removeEntry(${i})">Supprimer</button></div></div>`).join(""):'<div class="empty">Aucun aliment enregistré pour cette journée.</div>';
+}
+function removeEntry(i){dayData(date()).entries.splice(i,1);save();renderAll()}
+function renderFoods(){
+ $("foodList").innerHTML=data.foods.length?data.foods.map(f=>`<div class="item"><div><strong>${esc(f.name)}</strong><div class="muted">${f.calories} kcal / ${f.unit==="portion"?"portion":f.unit==="100g"?"100 g":"100 ml"}</div></div><button class="secondary danger" onclick="removeFood('${f.id}')">Supprimer</button></div>`).join(""):'<div class="empty">Ta bibliothèque est encore vide.</div>';
+ refreshFoodSelect();
+}
+function removeFood(id){if(confirm("Supprimer cet aliment de ta bibliothèque ?")){data.foods=data.foods.filter(f=>f.id!==id);save();renderAll()}}
+function last7(){
+ const arr=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);arr.push(d.toLocaleDateString("en-CA"))}return arr;
+}
+function renderStats(){
+ const days=last7().map(d=>({date:d,...dayData(d)}));
+ const consumed=days.filter(d=>d.entries.length>0).map(d=>d.entries.reduce((s,e)=>s+e.kcal,0));
+ const spent=days.filter(d=>d.expenditure!=null).map(d=>d.expenditure);
+ const balances=days.filter(d=>d.expenditure!=null).map(d=>d.entries.reduce((s,e)=>s+e.kcal,0)-d.expenditure);
+ const avg=a=>a.length?kcal(a.reduce((s,n)=>s+n,0)/a.length):"—";
+ $("avgIn").textContent=avg(consumed);$("avgOut").textContent=avg(spent);$("avgBalance").textContent=avg(balances);
+ $("deficitDays").textContent=balances.filter(n=>n<0).length;
+ const max=Math.max(1,...days.map(d=>d.entries.reduce((s,e)=>s+e.kcal,0)));
+ $("chart").innerHTML=days.map(d=>{let n=d.entries.reduce((s,e)=>s+e.kcal,0);return `<div class="daybar"><em>${n?kcal(n):"—"}</em><div style="height:${Math.max(3,n/max*95)}px"></div><small>${new Date(d.date+"T12:00:00").toLocaleDateString("fr-BE",{weekday:"short"}).slice(0,2)}</small></div>`}).join("");
+ const weights=Object.entries(data.days).filter(([d,v])=>v.weight!=null).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,10);
+ $("weightHistory").innerHTML=weights.length?weights.map(([d,v])=>`<div class="item"><span class="small">${new Date(d+"T12:00:00").toLocaleDateString("fr-BE")}</span><strong>${v.weight} kg</strong></div>`).join(""):'<div class="empty">Aucun poids enregistré pour le moment.</div>';
+}
+function renderAll(){renderToday();renderFoods();renderStats()}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active");renderStats()}));
+$("day").value=today();
+$("day").addEventListener("change",renderToday);
+$("foodSelect").addEventListener("change",()=>{refreshFoodSelect()});
+$("amount").addEventListener("input",updateCalc);
+$("saveFood").addEventListener("click",()=>{
+ const name=$("foodName").value.trim(),cal=Number($("foodCalories").value),unit=$("foodUnit").value;
+ if(!name||!Number.isFinite(cal)||cal<0){alert("Indique un nom et une valeur calorique valide.");return}
+ data.foods.push({id:crypto.randomUUID(),name,calories:cal,unit});save();$("foodName").value="";$("foodCalories").value="";renderAll();
+});
+$("addEntry").addEventListener("click",()=>{
+ const f=selectedFood(),amount=Number($("amount").value);
+ if(!f){alert("Ajoute d'abord un aliment dans ta bibliothèque.");return}
+ if(!Number.isFinite(amount)||amount<=0){alert("Indique une quantité valide.");return}
+ dayData(date()).entries.push({name:f.name,amount,unit:f.unit==="portion"?"portion":f.unit==="100ml"?"ml":"g",meal:$("meal").value,kcal:foodKcal(f,amount)});
+ $("amount").value="";save();renderAll();
+});
+$("saveExpenditure").addEventListener("click",()=>{let n=$("expenditure").value;if(n===""||Number(n)<0){alert("Indique une dépense valide.");return}dayData(date()).expenditure=Number(n);save();renderAll()});
+$("saveWeight").addEventListener("click",()=>{let n=Number($("weight").value);if(!n||n<0){alert("Indique un poids valide.");return}dayData(date()).weight=n;save();renderAll()});
+$("export").addEventListener("click",()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="balance-sauvegarde.json";a.click();URL.revokeObjectURL(url)});
+$("import").addEventListener("click",async()=>{const f=$("importFile").files[0];if(!f){alert("Choisis d'abord un fichier de sauvegarde.");return}try{const v=JSON.parse(await f.text());if(!Array.isArray(v.foods)||typeof v.days!=="object")throw Error();if(confirm("Remplacer les données actuelles par cette sauvegarde ?")){data=v;save();renderAll();alert("Sauvegarde restaurée.")}}catch(e){alert("Fichier de sauvegarde invalide.")}});
+renderAll();
+</script>
+</body>
+</html>
