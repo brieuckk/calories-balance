@@ -5,6 +5,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f7f4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Balance">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>Balance</title>
 <style>
 :root{--bg:#f7f7f4;--card:#fff;--ink:#20251f;--muted:#858b82;--green:#547b62;--pale:#e8efe9;--line:#e9ebe5;--red:#bd685c}
@@ -246,6 +251,10 @@ $("saveWeight").addEventListener("click",()=>{let n=Number($("weight").value);if
 $("export").addEventListener("click",()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="balance-sauvegarde.json";a.click();URL.revokeObjectURL(url)});
 $("import").addEventListener("click",async()=>{const f=$("importFile").files[0];if(!f){alert("Choisis d'abord un fichier de sauvegarde.");return}try{const v=JSON.parse(await f.text());if(!Array.isArray(v.foods)||typeof v.days!=="object")throw Error();if(confirm("Remplacer les données actuelles par cette sauvegarde ?")){data=v;save();renderAll();alert("Sauvegarde restaurée.")}}catch(e){alert("Fichier de sauvegarde invalide.")}});
 renderAll();
-</script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js");
+  });
+}</script>
 </body>
 </html>
