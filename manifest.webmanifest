@@ -1,0 +1,21 @@
+
+{
+  "id": "./",
+  "name": "Balance - Suivi calorique",
+  "short_name": "Balance",
+  "description": "Mon suivi personnel des calories et de mon équilibre énergétique.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f7f4",
+  "theme_color": "#f7f7f4",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
