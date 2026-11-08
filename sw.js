@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "balance-v1";
+const CACHE_NAME = "balance-v2";
 
 const ASSETS = [
   "./",
